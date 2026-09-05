@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta name="naver-site-verification" content="e7ac114136a2c032159531d308e78243563000f0" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>도화당 · 사주로 보는 나의 원국</title>
@@ -226,6 +225,72 @@ input[type="text"]:focus, input[type="date"]:focus{
 }
 .timegrid button.active .t2{color:rgba(255,255,255,.85);}
 .timegrid button.unknown{grid-column:span 4; margin-top:2px;}
+
+.cal-seg{display:flex; gap:8px; margin-bottom:10px;}
+.cal-seg button{
+  flex:0 0 auto;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:13px; font-weight:600;
+  padding:7px 16px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#FFFBF8;
+  color:var(--ink-soft);
+  cursor:pointer;
+  transition:.15s;
+}
+.cal-seg button.active{
+  background:var(--ink); border-color:var(--ink); color:#fff;
+}
+.lunar-row{display:grid; grid-template-columns:1.1fr 0.8fr 0.8fr; gap:8px;}
+select.lunar-select{
+  width:100%;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:14.5px;
+  color:var(--ink);
+  background:#FFFBF8;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px 10px;
+  outline:none;
+}
+.leap-check{
+  display:flex; align-items:center; gap:7px;
+  margin-top:9px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:13px;
+  color:var(--ink-soft);
+}
+.leap-check input{ width:16px; height:16px; accent-color:var(--rose-deep); }
+
+.compat-toggle-btn{
+  width:100%;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  background:none;
+  border:1px dashed var(--rose);
+  border-radius:10px;
+  padding:13px 10px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:14px; font-weight:600;
+  color:var(--rose-deep);
+  cursor:pointer;
+  margin-bottom:22px;
+}
+.compat-toggle-btn .plus{ font-size:16px; line-height:1; transition:transform .2s; }
+.compat-toggle-btn.open .plus{ transform:rotate(45deg); }
+.compat-panel{
+  max-height:0; overflow:hidden;
+  transition:max-height .3s ease;
+}
+.compat-panel.open{ max-height:900px; }
+.compat-panel-inner{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px 16px 6px;
+  margin-bottom:22px;
+  background:#FFFDFB;
+}
+.compat-panel-inner .field{margin-bottom:18px;}
 
 .submit-btn{
   width:100%;
@@ -506,46 +571,6 @@ footer.site-foot{
   .hero-inner{padding:24px 20px 22px; max-width:340px;}
 }
 
-.kakao-float{
-  position:fixed;
-  right:20px;
-  bottom:20px;
-  z-index:999;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  text-decoration:none;
-}
-.kakao-float .kakao-bubble{
-  width:56px; height:56px;
-  border-radius:50%;
-  background:#FEE500;
-  display:flex; align-items:center; justify-content:center;
-  box-shadow:0 8px 20px rgba(60,30,10,0.28);
-  transition:transform .2s ease, box-shadow .2s ease;
-}
-.kakao-float:hover .kakao-bubble{
-  transform:translateY(-2px) scale(1.05);
-  box-shadow:0 12px 26px rgba(60,30,10,0.34);
-}
-.kakao-float .kakao-bubble svg{ width:30px; height:30px; display:block; }
-.kakao-float .kakao-label{
-  background:#3C1E1E;
-  color:#FEE500;
-  font-family:'Noto Sans KR', sans-serif;
-  font-size:13px;
-  font-weight:700;
-  padding:9px 14px;
-  border-radius:999px;
-  box-shadow:0 6px 16px rgba(60,30,10,0.22);
-  white-space:nowrap;
-}
-@media (max-width:480px){
-  .kakao-float{ right:14px; bottom:14px; }
-  .kakao-float .kakao-bubble{ width:50px; height:50px; }
-  .kakao-float .kakao-bubble svg{ width:26px; height:26px; }
-  .kakao-float .kakao-label{ display:none; }
-}
 </style>
 </head>
 <body>
@@ -583,14 +608,59 @@ footer.site-foot{
       </div>
 
       <div class="field">
-        <label for="dateInput">생년월일 (양력)</label>
+        <label for="dateInput">생년월일</label>
+        <div class="cal-seg" id="calTypeSeg">
+          <button type="button" data-c="solar" class="active">양력</button>
+          <button type="button" data-c="lunar">음력</button>
+        </div>
         <input type="date" id="dateInput" min="1925-01-01" max="2037-12-31">
-        <div class="field-hint">음력 생일은 만세력으로 양력 변환 후 입력해 주세요. 절기(태양의 움직임) 기준으로 자동 보정됩니다.</div>
+        <div class="lunar-row" id="lunarFields" hidden>
+          <select class="lunar-select" id="lunarYear"></select>
+          <select class="lunar-select" id="lunarMonth"></select>
+          <select class="lunar-select" id="lunarDay"></select>
+        </div>
+        <label class="leap-check" id="leapWrap" hidden><input type="checkbox" id="leapMonth"> 윤달이에요</label>
+        <div class="field-hint">음력을 선택하시면 자동으로 양력으로 변환해 계산합니다. 절기(태양의 움직임) 기준으로도 자동 보정됩니다.</div>
       </div>
 
       <div class="field">
         <label>태어난 시간</label>
         <div class="timegrid" id="timeGrid"></div>
+      </div>
+
+      <button type="button" class="compat-toggle-btn" id="compatToggleBtn"><span class="plus">+</span> 상대방과 궁합도 함께 보기 (선택)</button>
+      <div class="compat-panel" id="compatPanel">
+        <div class="compat-panel-inner">
+          <div class="field">
+            <label for="partnerNameInput">상대방 이름 (선택)</label>
+            <input type="text" id="partnerNameInput" placeholder="상대방 이름을 입력해 주세요" maxlength="12">
+          </div>
+          <div class="field">
+            <label>상대방 성별</label>
+            <div class="seg" id="partnerGenderSeg">
+              <button type="button" data-g="female">여자</button>
+              <button type="button" data-g="male">남자</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="partnerDateInput">상대방 생년월일</label>
+            <div class="cal-seg" id="partnerCalTypeSeg">
+              <button type="button" data-c="solar" class="active">양력</button>
+              <button type="button" data-c="lunar">음력</button>
+            </div>
+            <input type="date" id="partnerDateInput" min="1925-01-01" max="2037-12-31">
+            <div class="lunar-row" id="partnerLunarFields" hidden>
+              <select class="lunar-select" id="partnerLunarYear"></select>
+              <select class="lunar-select" id="partnerLunarMonth"></select>
+              <select class="lunar-select" id="partnerLunarDay"></select>
+            </div>
+            <label class="leap-check" id="partnerLeapWrap" hidden><input type="checkbox" id="partnerLeapMonth"> 윤달이에요</label>
+          </div>
+          <div class="field">
+            <label>상대방 태어난 시간</label>
+            <div class="timegrid" id="partnerTimeGrid"></div>
+          </div>
+        </div>
       </div>
 
       <button type="submit" class="submit-btn">지금 바로 풀어보기</button>
@@ -612,6 +682,11 @@ footer.site-foot{
       <h3>오행 기운 분포</h3>
       <div id="elBars"></div>
       <div class="excess-callout" id="excessCallout"></div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-head"><div class="htxt"><span class="ico"></span><h3>오늘의 운세</h3></div><span class="chev"></span></div>
+      <div class="acc-body"><div class="acc-body-inner" id="accToday"></div></div>
     </div>
 
     <div class="acc">
@@ -654,6 +729,11 @@ footer.site-foot{
       <div class="acc-body"><div class="acc-body-inner" id="accPrescription"></div></div>
     </div>
 
+    <div class="acc" id="accCompatWrap" hidden>
+      <div class="acc-head"><div class="htxt"><span class="ico"></span><h3>궁합 · 두 사람의 인연</h3></div><span class="chev"></span></div>
+      <div class="acc-body"><div class="acc-body-inner" id="accCompat"></div></div>
+    </div>
+
     <div class="keyword-block" id="closingBlock"></div>
 
     <button type="button" class="restart" id="restartBtn">다시 풀어보기</button>
@@ -666,6 +746,7 @@ footer.site-foot{
   </footer>
 
 </div>
+<script src="https://unpkg.com/korean-lunar-calendar@0.4.0/dist/korean-lunar-calendar.min.js"></script>
 <script>
 
 const TERMS = {"1925":[-39438440,-39395976,-39353114,-39309592,-39265317,-39220399,-39175130,-39129907,-39085115,-39041008,-38997649,-38954903],"1926":[-38912480,-38870016,-38827155,-38783637,-38739368,-38694454,-38649190,-38603971,-38559180,-38515071,-38471708,-38428957],"1927":[-38386530,-38344065,-38301205,-38257690,-38213423,-38168511,-38123246,-38078024,-38033230,-37989121,-37945759,-37903009],"1928":[-37860584,-37818118,-37775258,-37731741,-37687473,-37642559,-37597291,-37552067,-37507273,-37463165,-37419806,-37377057],"1929":[-37334632,-37292165,-37249302,-37205783,-37161514,-37116604,-37071342,-37026125,-36981334,-36937227,-36893866,-36851117],"1930":[-36808690,-36766221,-36723356,-36679835,-36635566,-36590655,-36545392,-36500174,-36455383,-36411274,-36367912,-36325161],"1931":[-36282735,-36240269,-36197408,-36153890,-36109621,-36064709,-36019444,-35974225,-35929432,-35885323,-35841960,-35799209],"1932":[-35756783,-35714318,-35671459,-35627942,-35583673,-35538760,-35493495,-35448275,-35403484,-35359378,-35316018,-35273269],"1933":[-35230843,-35188377,-35145514,-35101996,-35057725,-35012809,-34967541,-34922319,-34877527,-34833421,-34790062,-34747314],"1934":[-34704888,-34662420,-34619558,-34576041,-34531774,-34486863,-34441599,-34396379,-34351587,-34307479,-34264117,-34221367],"1935":[-34178940,-34136474,-34093612,-34050097,-34005831,-33960921,-33915657,-33870434,-33825638,-33781527,-33738165,-33695418],"1936":[-33652995,-33610532,-33567672,-33524155,-33479886,-33434971,-33389703,-33344478,-33299681,-33255570,-33212208,-33169460],"1937":[-33127038,-33084576,-33041717,-32998201,-32953932,-32909019,-32863756,-32818536,-32773743,-32729632,-32686268,-32643516],"1938":[-32601091,-32558627,-32515769,-32472254,-32427988,-32383076,-32337811,-32292590,-32247795,-32203682,-32160316,-32117562],"1939":[-32075136,-32032673,-31989818,-31946307,-31902044,-31857133,-31811866,-31766641,-31721843,-31677729,-31634362,-31591609],"1940":[-31549182,-31506718,-31463862,-31420352,-31376091,-31331183,-31285919,-31240695,-31195898,-31151785,-31108421,-31065670],"1941":[-31023244,-30980778,-30937918,-30894404,-30850140,-30805230,-30759966,-30714743,-30669946,-30625832,-30582466,-30539714],"1942":[-30497288,-30454821,-30411961,-30368447,-30324185,-30279279,-30234020,-30188801,-30144006,-30099891,-30056522,-30013766],"1943":[-29971337,-29928872,-29886014,-29842502,-29798241,-29753335,-29708075,-29662855,-29618059,-29573944,-29530576,-29487821],"1944":[-29445395,-29402931,-29360074,-29316561,-29272296,-29227385,-29182119,-29136896,-29092100,-29047987,-29004621,-28961868],"1945":[-28919440,-28876975,-28834117,-28790604,-28746340,-28701431,-28656169,-28610950,-28566158,-28522047,-28478682,-28435928],"1946":[-28393499,-28351031,-28308171,-28264657,-28220395,-28175487,-28130225,-28085004,-28040208,-27996095,-27952729,-27909975],"1947":[-27867548,-27825084,-27782227,-27738715,-27694453,-27649544,-27604279,-27559054,-27514253,-27470137,-27426770,-27384018],"1948":[-27341593,-27299131,-27256275,-27212764,-27168502,-27123594,-27078330,-27033106,-26988308,-26944193,-26900826,-26858075],"1949":[-26815651,-26773189,-26730332,-26686820,-26642556,-26597645,-26552380,-26507156,-26462357,-26418240,-26374871,-26332117],"1950":[-26289691,-26247228,-26204374,-26160865,-26116605,-26071698,-26026436,-25981213,-25936415,-25892297,-25848925,-25806167],"1951":[-25763737,-25721274,-25678420,-25634915,-25590658,-25545755,-25500493,-25455269,-25410468,-25366350,-25322980,-25280224],"1952":[-25237796,-25195332,-25152478,-25108970,-25064712,-25019805,-24974540,-24929313,-24884511,-24840392,-24797023,-24754269],"1953":[-24711842,-24669377,-24626521,-24583011,-24538751,-24493847,-24448588,-24403368,-24358570,-24314453,-24271082,-24228326],"1954":[-24185897,-24143431,-24100574,-24057063,-24012804,-23967901,-23922643,-23877422,-23832624,-23788505,-23745132,-23702374],"1955":[-23659946,-23617484,-23574630,-23531123,-23486864,-23441959,-23396696,-23351471,-23306670,-23262550,-23219177,-23176420],"1956":[-23133992,-23091530,-23048677,-23005171,-22960913,-22916007,-22870744,-22825522,-22780723,-22736607,-22693237,-22650481],"1957":[-22608052,-22565588,-22522733,-22479225,-22434965,-22390059,-22344795,-22299571,-22254771,-22210654,-22167285,-22124529],"1958":[-22082100,-22039635,-21996780,-21953273,-21909016,-21864113,-21818852,-21773628,-21728827,-21684707,-21641335,-21598577],"1959":[-21556148,-21513684,-21470830,-21427324,-21383069,-21338168,-21292908,-21247683,-21202880,-21158759,-21115387,-21072632],"1960":[-21030206,-20987745,-20944893,-20901386,-20857128,-20812222,-20766957,-20721730,-20676925,-20632802,-20589429,-20546673],"1961":[-20504248,-20461788,-20418937,-20375430,-20331171,-20286267,-20241006,-20195784,-20150983,-20106862,-20063487,-20020727],"1962":[-19978298,-19935835,-19892984,-19849480,-19805225,-19760323,-19715063,-19669840,-19625039,-19580917,-19537540,-19494778],"1963":[-19452348,-19409886,-19367037,-19323537,-19279284,-19234382,-19189118,-19143890,-19099084,-19054960,-19011584,-18968823],"1964":[-18926393,-18883930,-18841079,-18797578,-18753325,-18708425,-18663164,-18617939,-18573136,-18529015,-18485641,-18442883],"1965":[-18400453,-18357989,-18315135,-18271629,-18227375,-18182474,-18137214,-18091991,-18047187,-18003064,-17959689,-17916930],"1966":[-17874500,-17832036,-17789183,-17745678,-17701425,-17656525,-17611267,-17566045,-17521242,-17477117,-17433739,-17390976],"1967":[-17348545,-17306082,-17263231,-17219728,-17175476,-17130577,-17085319,-17040097,-16995294,-16951171,-16907795,-16865034],"1968":[-16822605,-16780143,-16737293,-16693790,-16649536,-16604632,-16559369,-16514143,-16469338,-16425216,-16381841,-16339081],"1969":[-16296652,-16254190,-16211338,-16167834,-16123579,-16078677,-16033417,-15988193,-15943392,-15899271,-15855897,-15813136],"1970":[-15770705,-15728240,-15685388,-15641885,-15597633,-15552734,-15507475,-15462251,-15417448,-15373324,-15329948,-15287188],"1971":[-15244760,-15202299,-15159449,-15115949,-15071697,-15026796,-14981533,-14936303,-14891493,-14847365,-14803987,-14761228],"1972":[-14718801,-14676342,-14633495,-14589994,-14545742,-14500841,-14455580,-14410353,-14365547,-14321421,-14278044,-14235284],"1973":[-14192857,-14150397,-14107549,-14064048,-14019796,-13974895,-13929634,-13884409,-13839602,-13795475,-13752095,-13709332],"1974":[-13666902,-13624441,-13581594,-13538097,-13493848,-13448950,-13403690,-13358464,-13313657,-13269528,-13226145,-13183378],"1975":[-13140945,-13098483,-13055636,-13012141,-12967896,-12923001,-12877743,-12832517,-12787710,-12743581,-12700201,-12657437],"1976":[-12615006,-12572544,-12529695,-12486198,-12441950,-12397053,-12351793,-12306566,-12261756,-12217627,-12174247,-12131484],"1977":[-12089054,-12046591,-12003741,-11960240,-11915991,-11871094,-11825838,-11780616,-11735811,-11691683,-11648302,-11605537],"1978":[-11563104,-11520640,-11477789,-11434289,-11390040,-11345146,-11299892,-11254671,-11209867,-11165739,-11122356,-11079590],"1979":[-11037158,-10994697,-10951850,-10908353,-10864104,-10819206,-10773946,-10728720,-10683912,-10639782,-10596399,-10553634],"1980":[-10511203,-10468742,-10425896,-10382398,-10338149,-10293250,-10247989,-10202765,-10157960,-10113835,-10070456,-10027693],"1981":[-9985261,-9942798,-9899949,-9856450,-9812200,-9767302,-9722043,-9676818,-9632012,-9587886,-9544507,-9501744],"1982":[-9459312,-9416849,-9374000,-9330503,-9286256,-9241360,-9196101,-9150874,-9106064,-9061934,-9018552,-8975788],"1983":[-8933356,-8890895,-8848048,-8804552,-8760306,-8715411,-8670153,-8624926,-8580116,-8535985,-8492604,-8449842],"1984":[-8407414,-8364956,-8322110,-8278613,-8234365,-8189467,-8144206,-8098977,-8054165,-8010032,-7966650,-7923887],"1985":[-7881459,-7839002,-7796157,-7752661,-7708412,-7663514,-7618255,-7573029,-7528220,-7484089,-7440704,-7397937],"1986":[-7355504,-7313044,-7270200,-7226706,-7182462,-7137568,-7092311,-7047086,-7002277,-6958145,-6914759,-6871990],"1987":[-6829557,-6787098,-6744256,-6700766,-6656525,-6611631,-6566371,-6521140,-6476325,-6432190,-6388804,-6346037],"1988":[-6303604,-6261145,-6218301,-6174809,-6130567,-6085673,-6040414,-5995186,-5950375,-5906242,-5862858,-5820092],"1989":[-5777660,-5735198,-5692351,-5648856,-5604612,-5559720,-5514465,-5469241,-5424431,-5380298,-5336912,-5294144],"1990":[-5251711,-5209250,-5166404,-5122911,-5078669,-5033778,-4988523,-4943297,-4898486,-4854350,-4810960,-4768189],"1991":[-4725754,-4683294,-4640450,-4596958,-4552716,-4507824,-4462569,-4417344,-4372534,-4328401,-4285015,-4242246],"1992":[-4199813,-4157353,-4114509,-4071017,-4026774,-3981880,-3936621,-3891394,-3846583,-3802451,-3759066,-3716298],"1993":[-3673865,-3631404,-3588559,-3545065,-3500821,-3455927,-3410670,-3365444,-3320634,-3276503,-3233118,-3190349],"1994":[-3147914,-3105451,-3062605,-3019111,-2974869,-2929979,-2884724,-2839498,-2794688,-2750555,-2707169,-2664401],"1995":[-2621970,-2579511,-2536668,-2493177,-2448935,-2404043,-2358784,-2313553,-2268737,-2224599,-2181211,-2138444],"1996":[-2096014,-2053558,-2010716,-1967225,-1922981,-1878087,-1832827,-1787598,-1742785,-1698649,-1655262,-1612495],"1997":[-1570064,-1527606,-1484764,-1441273,-1397030,-1352137,-1306880,-1261653,-1216841,-1172705,-1129316,-1086546],"1998":[-1044112,-1001653,-958814,-915327,-871089,-826199,-780942,-735712,-690896,-646757,-603365,-560591],"1999":[-518155,-475695,-432855,-389369,-345133,-300245,-254989,-209760,-164944,-120806,-77417,-34647],"2000":[7787,50247,93088,136577,180814,225703,270959,316188,361004,405143,448532,491301],"2001":[533734,576194,619037,662529,706768,751657,796911,842137,886950,931089,974481,1017253],"2002":[1059688,1102149,1144992,1188482,1232721,1277609,1322860,1368084,1412896,1457034,1500426,1543199],"2003":[1585633,1628091,1670930,1714417,1758655,1803545,1848801,1894030,1938846,1982986,2026379,2069151],"2004":[2111585,2154043,2196883,2240370,2284608,2329500,2374758,2419987,2464800,2508937,2552326,2595097],"2005":[2637531,2679992,2722834,2766323,2810561,2855450,2900706,2945933,2990746,3034882,3078272,3121043],"2006":[3163478,3205938,3248779,3292266,3336501,3381388,3426643,3471873,3516691,3560833,3604226,3646999],"2007":[3689433,3731892,3774731,3818217,3862453,3907340,3952595,3997825,4042644,4086785,4130178,4172948],"2008":[4215380,4257836,4300674,4344161,4388398,4433287,4478543,4523772,4568590,4612732,4656126,4698898],"2009":[4741331,4783787,4826624,4870110,4914347,4959236,5004491,5049719,5094535,5138677,5182073,5224850],"2010":[5267287,5309746,5352584,5396068,5440302,5485187,5530441,5575668,5620483,5664624,5708020,5750796],"2011":[5793233,5835692,5878528,5922010,5966241,6011125,6056380,6101612,6146433,6190577,6233972,6276746],"2012":[6319182,6361641,6404479,6447963,6492197,6537083,6582339,6627568,6672386,6716529,6759922,6802696],"2013":[6845131,6887591,6930432,6973919,7018154,7063039,7108291,7153517,7198332,7242474,7285869,7328644],"2014":[7371080,7413539,7456377,7499861,7544093,7588977,7634229,7679457,7724275,7768421,7811819,7854597],"2015":[7897034,7939492,7982329,8025811,8070044,8114930,8160184,8205413,8250231,8294374,8337769,8380544],"2016":[8422979,8465437,8508274,8551757,8595991,8640878,8686133,8731363,8776180,8820322,8863716,8906490],"2017":[8948924,8991383,9034221,9077705,9121938,9166824,9212078,9257307,9302126,9346268,9389664,9432439],"2018":[9474876,9517336,9560175,9603658,9647891,9692774,9738027,9783256,9828075,9872220,9915616,9958391],"2019":[10000824,10043280,10086115,10129596,10173827,10218710,10263965,10309198,10354021,10398170,10441568,10484343],"2020":[10526775,10569228,10612062,10655542,10699775,10744662,10789919,10835151,10879972,10924119,10967518,11010294],"2021":[11052728,11095184,11138019,11181499,11225731,11270616,11315870,11361099,11405918,11450064,11493463,11536242],"2022":[11578680,11621137,11663970,11707445,11751671,11796551,11841804,11887035,11931859,11976009,12019411,12062193],"2023":[12104632,12147090,12189924,12233400,12277625,12322505,12367758,12412991,12457815,12501964,12545364,12588141],"2024":[12630578,12673037,12715872,12759351,12803579,12848459,12893710,12938940,12983762,13027910,13071310,13114088],"2025":[13156524,13198982,13241819,13285300,13329529,13374408,13419657,13464884,13509705,13553853,13597256,13640037],"2026":[13682477,13724936,13767773,13811253,13855482,13900362,13945611,13990838,14035656,14079804,14123206,14165987],"2027":[14208425,14250882,14293715,14337193,14381420,14426302,14471554,14516783,14561605,14605753,14649155,14691934],"2028":[14734372,14776828,14819662,14863140,14907369,14952253,14997508,15042739,15087560,15131706,15175104,15217882],"2029":[15260320,15302779,15345616,15389096,15433325,15478208,15523461,15568690,15613510,15657656,15701054,15743831],"2030":[15786269,15828727,15871562,15915039,15959264,16004142,16049394,16094626,16139451,16183603,16227006,16269785],"2031":[16312221,16354676,16397509,16440985,16485212,16530092,16575346,16620580,16665407,16709559,16752961,16795739],"2032":[16838172,16880625,16923456,16966933,17011161,17056043,17101296,17146528,17191353,17235505,17278908,17321687],"2033":[17364123,17406576,17449406,17492882,17537107,17581986,17627238,17672469,17717293,17761446,17804853,17847637],"2034":[17890077,17932534,17975364,18018837,18063060,18107937,18153188,18198420,18243244,18287397,18330803,18373586],"2035":[18416026,18458481,18501311,18544783,18589003,18633879,18679130,18724363,18769190,18813345,18856751,18899533],"2036":[18941971,18984428,19027259,19070733,19114955,19159833,19205084,19250315,19295141,19339294,19382700,19425482],"2037":[19467920,19510378,19553212,19596689,19640914,19685791,19731040,19776268,19821090,19865242,19908648,19951432]};
@@ -976,7 +1057,56 @@ const YEAR_FLOW = {
   '편인': '혼자만의 시간과 몰입이 필요해지는 해입니다. 연구, 자격증, 새로운 분야 탐색처럼 깊이 파고드는 일에 유리한 흐름이지만, 사람들과 거리를 두고 생각이 많아지며 다소 예민해질 수 있습니다. 의도적으로 사람을 만나는 시간을 마련해두는 것이 균형에 도움이 됩니다.'
 };
 
-// 마무리 한마디 + 키워드 — 격국(5) × 오행 최다(5) = 25종으로 확장
+// 오늘의 운세 — 십성(specific) 기준 10종, 하루 단위로 짧게
+const TODAY_FLOW = {
+  '비견': '오늘은 남에게 기대기보다 스스로 판단하고 밀어붙이는 편이 잘 통하는 하루입니다. 동료와의 사소한 신경전은 한 발 양보하는 여유가 도움이 됩니다.',
+  '겁재': '오늘은 경쟁심이나 지출 욕구가 살짝 커지는 하루입니다. 충동적인 소비나 감정적인 언쟁은 잠시 미뤄두는 것이 좋습니다.',
+  '식신': '오늘은 표현력과 여유가 살아나는 하루입니다. 좋아하는 것을 나누거나 맛있는 것을 챙겨 먹으면 기분 좋게 흘러갑니다.',
+  '상관': '오늘은 하고 싶은 말이 많아지는 하루입니다. 재치 있는 아이디어는 환영받지만, 날카로운 말은 한 번 걸러서 전하는 것이 좋습니다.',
+  '정재': '오늘은 꾸준함이 빛을 발하는 안정적인 하루입니다. 미뤄뒀던 정리나 계획을 실행하기에 좋은 흐름입니다.',
+  '편재': '오늘은 사람과 기회가 자연스럽게 따라붙는 하루입니다. 다만 씀씀이가 헐거워지기 쉬우니 지출은 가볍게 점검해두면 좋습니다.',
+  '정관': '오늘은 신뢰와 인정을 받기 좋은 하루입니다. 중요한 미팅이나 약속이 있다면 평소보다 더 좋은 인상을 남길 수 있습니다.',
+  '편관': '오늘은 긴장되는 일이나 부담스러운 요청이 생기기 쉬운 하루입니다. 무리한 일정보다는 여유 있게 대응하는 편이 좋습니다.',
+  '정인': '오늘은 배움이나 귀인의 도움과 인연이 닿는 하루입니다. 누군가의 조언에 평소보다 더 귀 기울여 보세요.',
+  '편인': '오늘은 혼자만의 시간이 필요한 하루입니다. 사람 많은 자리보다는 차분히 생각을 정리하는 시간이 마음을 편안하게 합니다.'
+};
+function getTodayPillar(){
+  const now = new Date();
+  const jd = jdn(now.getFullYear(), now.getMonth()+1, now.getDate());
+  const stem = ((jd+9)%10+10)%10;
+  const branch = ((jd+1)%12+12)%12;
+  return {stem, branch};
+}
+
+// ===== 궁합 =====
+const YUKHAP_PAIRS = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+const CHUNG_PAIRS = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+const WONJIN_PAIRS = [[0,7],[1,6],[2,9],[3,8],[4,11],[5,10]];
+function pairMatch(list, a, b){ return list.some(p => (p[0]===a&&p[1]===b) || (p[0]===b&&p[1]===a)); }
+function getBranchRelation(a, b){
+  if(a===b) return '동일';
+  if(SAMHAP_GROUP_OF_BRANCH[a] && SAMHAP_GROUP_OF_BRANCH[a]===SAMHAP_GROUP_OF_BRANCH[b]) return '삼합';
+  if(pairMatch(YUKHAP_PAIRS,a,b)) return '육합';
+  if(pairMatch(CHUNG_PAIRS,a,b)) return '충';
+  if(pairMatch(WONJIN_PAIRS,a,b)) return '원진';
+  return '없음';
+}
+const COMPAT_OHANG = {
+  '비겁': '두 사람은 같은 기운을 지닌 오행 궁합입니다. 서로를 잘 이해하고 편하게 느끼는 사이지만, 닮은 만큼 같은 지점에서 부딪히기도 하니 서로 다른 부분을 인정하는 노력이 도움이 됩니다.',
+  '식상': '내가 상대방에게 기운을 불어넣어 주는 오행 궁합입니다. 상대방을 챙기고 이끄는 역할을 자연스럽게 맡게 되며, 상대방은 곁에서 표현력과 여유를 얻습니다.',
+  '재성': '내가 상대방을 이끌고 다루는 오행 궁합입니다. 주도권을 쥐기 쉬운 관계이지만, 일방적이 되지 않도록 상대방의 의견에 귀 기울이는 균형이 필요합니다.',
+  '관성': '상대방이 나에게 자극과 긴장을 주는 오행 궁합입니다. 처음엔 부딪히는 느낌이 있어도, 서로를 성장시키는 좋은 자극이 되어주는 관계입니다.',
+  '인성': '상대방이 나에게 힘을 보태주는 오행 궁합입니다. 곁에 있으면 마음이 편안해지고, 든든하게 채워지는 느낌을 받기 쉬운 관계입니다.'
+};
+const COMPAT_BRANCH = {
+  '동일': '두 사람의 일지 글자가 똑같습니다. 서로를 거울처럼 잘 이해하는 편안한 관계이지만, 같은 약점도 함께 가지고 있을 수 있어 서로 보완해줄 다른 부분을 함께 찾아가면 좋습니다.',
+  '삼합': '두 사람의 일지가 삼합으로 이어지는 좋은 궁합입니다. 별다른 노력 없이도 자연스럽게 합이 맞고, 함께 있을 때 서로의 부족한 부분이 채워지는 관계입니다.',
+  '육합': '두 사람의 일지가 육합으로 이어지는 다정한 궁합입니다. 편안하고 안정적인 분위기가 자연스럽게 만들어지는 관계로, 함께 있으면 마음이 놓이는 상대입니다.',
+  '충': '두 사람의 일지가 충(沖)하는 관계입니다. 서로 다른 기운이 부딪히는 만큼 자극과 활력이 넘치지만, 감정이 격해지지 않도록 대화로 풀어가는 노력이 필요합니다.',
+  '원진': '두 사람의 일지가 원진(怨嗔)의 기운으로 얽혀 있습니다. 가까이 있으면 사소한 것에도 서운함이 쌓이기 쉽지만, 떨어져 있으면 오히려 그리워지는 애증의 인연이기도 합니다.',
+  '없음': '두 사람의 일지 사이에 특별히 강하게 부딪히거나 끌어당기는 기운은 없습니다. 무난하고 안정적으로 흘러가는 관계입니다.'
+};
+
 const CLOSING = {
   '비겁': {
     '목': { line: '거침없이 뻗어나가며 스스로 길을 개척하는 사주입니다.', keywords: ['독립', '추진력', '개척정신', '성장'] },
@@ -1168,6 +1298,10 @@ const EL_COLOR = { '목':'var(--el-wood)','화':'var(--el-fire)','토':'var(--el
 
 let selectedGender = null;
 let selectedTimeIdx = null; // 0-11, or 'unknown'
+let partnerGender = null;
+let partnerTimeIdx = null;
+let mainCalType = 'solar';
+let partnerCalType = 'solar';
 const TIME_BLOCKS = [
   ['자시','子','23:00-01:00'], ['축시','丑','01:00-03:00'], ['인시','寅','03:00-05:00'], ['묘시','卯','05:00-07:00'],
   ['진시','辰','07:00-09:00'], ['사시','巳','09:00-11:00'], ['오시','午','11:00-13:00'], ['미시','未','13:00-15:00'],
@@ -1175,15 +1309,15 @@ const TIME_BLOCKS = [
 ];
 const TIME_MID = [0,2,4,6,8,10,12,14,16,18,20,22]; // representative hour(24h) used for calc, minute=0
 
-function buildTimeGrid(){
-  const grid = document.getElementById('timeGrid');
+function buildTimeGrid(gridId, onSelect){
+  const grid = document.getElementById(gridId);
   TIME_BLOCKS.forEach((tb, i) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.innerHTML = `<span class="t1">${tb[0]}</span><span class="t2">${tb[2]}</span>`;
     btn.addEventListener('click', () => {
-      selectedTimeIdx = i;
-      document.querySelectorAll('#timeGrid button').forEach(b=>b.classList.remove('active'));
+      onSelect(i);
+      grid.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
     });
     grid.appendChild(btn);
@@ -1193,22 +1327,66 @@ function buildTimeGrid(){
   unknownBtn.className = 'unknown';
   unknownBtn.innerHTML = `<span class="t1">태어난 시간을 몰라요</span>`;
   unknownBtn.addEventListener('click', () => {
-    selectedTimeIdx = 'unknown';
-    document.querySelectorAll('#timeGrid button').forEach(b=>b.classList.remove('active'));
+    onSelect('unknown');
+    grid.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
     unknownBtn.classList.add('active');
   });
   grid.appendChild(unknownBtn);
 }
 
-function wireGender(){
-  document.querySelectorAll('#genderSeg button').forEach(btn=>{
+function wireGender(segId, onSelect){
+  document.querySelectorAll('#'+segId+' button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      selectedGender = btn.dataset.g;
-      document.querySelectorAll('#genderSeg button').forEach(b=>b.classList.remove('active'));
+      onSelect(btn.dataset.g);
+      document.querySelectorAll('#'+segId+' button').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
     });
   });
 }
+
+function populateLunarSelects(yearId, monthId, dayId){
+  const yearSel = document.getElementById(yearId);
+  const monthSel = document.getElementById(monthId);
+  const daySel = document.getElementById(dayId);
+  const nowY = new Date().getFullYear();
+  for(let y=nowY; y>=1925; y--){
+    const o = document.createElement('option'); o.value=y; o.textContent=y+'년'; yearSel.appendChild(o);
+  }
+  for(let m=1;m<=12;m++){
+    const o = document.createElement('option'); o.value=m; o.textContent=m+'월'; monthSel.appendChild(o);
+  }
+  for(let d=1;d<=30;d++){
+    const o = document.createElement('option'); o.value=d; o.textContent=d+'일'; daySel.appendChild(o);
+  }
+}
+
+function wireCalToggle(segId, dateInputId, lunarFieldsId, leapWrapId, setType){
+  document.querySelectorAll('#'+segId+' button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#'+segId+' button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const type = btn.dataset.c;
+      setType(type);
+      const isLunar = type==='lunar';
+      document.getElementById(dateInputId).hidden = isLunar;
+      document.getElementById(lunarFieldsId).hidden = !isLunar;
+      document.getElementById(leapWrapId).hidden = !isLunar;
+    });
+  });
+}
+
+// 음력 → 양력 변환 (KoreanLunarCalendar 라이브러리 사용)
+function lunarToSolar(y, m, d, isLeap){
+  try{
+    const cal = new KoreanLunarCalendar();
+    const ok = cal.setLunarDate(y, m, d, !!isLeap);
+    if(ok === false) return null;
+    return cal.getSolarCalendar();
+  }catch(e){
+    return null;
+  }
+}
+
 
 function pctBar(el, pct){
   return `<div class="elrow"><div class="elname">${el}</div><div class="elbar"><div style="width:${pct}%; background:${EL_COLOR[el]}"></div></div><div class="elpct">${pct}%</div></div>`;
@@ -1236,7 +1414,7 @@ function pillarHtml(label, p, isEmpty){
 }
 
 function renderResult(input){
-  const { name, gender, y, m, d, hasTime, hh, mm } = input;
+  const { name, gender, y, m, d, hasTime, hh, mm, partner } = input;
   const saju = calcSaju(y,m,d, hasTime?hh:12, hasTime?mm:0, hasTime);
   const dist = elementDistribution(saju);
   const gk = analyzeGyeokguk(saju);
@@ -1289,6 +1467,17 @@ function renderResult(input){
   }
   document.getElementById('accYears').innerHTML = yearsHtml;
 
+  // 오늘의 운세
+  const todayPillar = getTodayPillar();
+  const todayRel = tenGodOfStem(todayPillar.stem, dayStemIdx);
+  const todayStr = (()=>{ const n=new Date(); return `${n.getFullYear()}. ${n.getMonth()+1}. ${n.getDate()}`; })();
+  document.getElementById('accToday').innerHTML = `
+    <div class="year-block" style="border-bottom:none; padding-bottom:0;">
+      <div class="ytitle">${todayStr} (${STEM[todayPillar.stem]}${BRANCH[todayPillar.branch]}일) · ${todayRel.specific}</div>
+      <p>${TODAY_FLOW[todayRel.specific]}</p>
+    </div>
+  `;
+
   // 아코디언 3: 재물운
   document.getElementById('accWealth').innerHTML = `<p>${WEALTH[gk.group]}</p>`;
 
@@ -1314,6 +1503,28 @@ function renderResult(input){
   // 아코디언 7: 오행 처방
   const presc = PRESCRIPTION[weak];
   document.getElementById('accPrescription').innerHTML = `<p>${weak}(${EL_HANJA[EL_KO.indexOf(weak)]}) 기운이 상대적으로 부족한 구조입니다. ${presc.color}을 가까이 하고, ${presc.direction} 방향과 관련된 공간을 챙겨보세요. ${presc.taste}과 ${presc.material}을 곁에 두는 것도 도움이 되며, ${presc.extra}도 함께 신경 쓰면 좋습니다.</p>`;
+
+  // 궁합
+  const compatWrap = document.getElementById('accCompatWrap');
+  if(partner){
+    const pSaju = calcSaju(partner.y, partner.m, partner.d, partner.hasTime?partner.hh:12, partner.hasTime?partner.mm:0, partner.hasTime);
+    const pDayStemIdx = pSaju.day.stem;
+    const ohangRel = tenGodOfStem(pDayStemIdx, dayStemIdx); // 상대방이 나에게 무엇인지
+    const branchRel = getBranchRelation(saju.day.branch, pSaju.day.branch);
+    const me = name ? name+'님' : '나';
+    const you = partner.name ? partner.name+'님' : '상대방';
+    compatWrap.hidden = false;
+    document.getElementById('accCompat').innerHTML = `
+      <p>${me}(${STEM[dayStemIdx]}${BRANCH[saju.day.branch]}일주)과 ${you}(${STEM[pDayStemIdx]}${BRANCH[pSaju.day.branch]}일주)의 인연을 살펴봅니다.</p>
+      <h4>오행 궁합</h4>
+      <p>${COMPAT_OHANG[ohangRel.group]}</p>
+      <h4>지지(일지) 궁합</h4>
+      <p>${COMPAT_BRANCH[branchRel]}</p>
+    `;
+  } else {
+    compatWrap.hidden = true;
+    document.getElementById('accCompat').innerHTML = '';
+  }
 
   // 신살 종합 (도화살 강조 + 나머지 발견된 신살 목록)
   const hasDohwa = findDohwa(saju);
@@ -1366,24 +1577,80 @@ function setupAccordions(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  buildTimeGrid();
-  wireGender();
+  buildTimeGrid('timeGrid', (v)=>{ selectedTimeIdx = v; });
+  buildTimeGrid('partnerTimeGrid', (v)=>{ partnerTimeIdx = v; });
+  wireGender('genderSeg', (g)=>{ selectedGender = g; });
+  wireGender('partnerGenderSeg', (g)=>{ partnerGender = g; });
+  wireCalToggle('calTypeSeg','dateInput','lunarFields','leapWrap', (t)=>{ mainCalType = t; });
+  wireCalToggle('partnerCalTypeSeg','partnerDateInput','partnerLunarFields','partnerLeapWrap', (t)=>{ partnerCalType = t; });
+  populateLunarSelects('lunarYear','lunarMonth','lunarDay');
+  populateLunarSelects('partnerLunarYear','partnerLunarMonth','partnerLunarDay');
   setupAccordions();
+
+  const compatToggleBtn = document.getElementById('compatToggleBtn');
+  const compatPanel = document.getElementById('compatPanel');
+  compatToggleBtn.addEventListener('click', ()=>{
+    const isOpen = compatPanel.classList.toggle('open');
+    compatToggleBtn.classList.toggle('open', isOpen);
+    compatToggleBtn.innerHTML = isOpen
+      ? '<span class="plus">+</span> 궁합 입력 접기'
+      : '<span class="plus">+</span> 상대방과 궁합도 함께 보기 (선택)';
+  });
+
+  function resolveSolarDate(calType, dateInputId, lunarYearId, lunarMonthId, lunarDayId, leapId, errEl, whoLabel){
+    if(calType === 'solar'){
+      const dateVal = document.getElementById(dateInputId).value;
+      if(!dateVal) return {error: whoLabel+' 생년월일을 입력해 주세요.'};
+      const [y,m,d] = dateVal.split('-').map(Number);
+      if(y < 1925 || y > 2037) return {error:'1925년~2037년 사이의 생년월일만 계산할 수 있습니다.'};
+      return {y,m,d};
+    } else {
+      const ly = parseInt(document.getElementById(lunarYearId).value, 10);
+      const lm = parseInt(document.getElementById(lunarMonthId).value, 10);
+      const ld = parseInt(document.getElementById(lunarDayId).value, 10);
+      const isLeap = document.getElementById(leapId).checked;
+      const solar = lunarToSolar(ly, lm, ld, isLeap);
+      if(!solar) return {error:whoLabel+' 음력 날짜를 다시 확인해 주세요. (윤달 여부 포함)'};
+      return {y:solar.year, m:solar.month, d:solar.day};
+    }
+  }
 
   document.getElementById('sajuForm').addEventListener('submit', (e)=>{
     e.preventDefault();
     const errEl = document.getElementById('errorMsg');
     errEl.style.display = 'none';
     const name = document.getElementById('nameInput').value;
-    const dateVal = document.getElementById('dateInput').value;
     if(!selectedGender){ errEl.textContent='성별을 선택해 주세요.'; errEl.style.display='block'; return; }
-    if(!dateVal){ errEl.textContent='생년월일을 입력해 주세요.'; errEl.style.display='block'; return; }
     if(selectedTimeIdx===null){ errEl.textContent='태어난 시간을 선택해 주세요. 모르신다면 "태어난 시간을 몰라요"를 선택해 주세요.'; errEl.style.display='block'; return; }
-    const [y,m,d] = dateVal.split('-').map(Number);
-    if(y < 1925 || y > 2037){ errEl.textContent='1925년~2037년 사이의 생년월일만 계산할 수 있습니다.'; errEl.style.display='block'; return; }
+
+    const resolved = resolveSolarDate(mainCalType,'dateInput','lunarYear','lunarMonth','lunarDay','leapMonth', errEl, '');
+    if(resolved.error){ errEl.textContent=resolved.error; errEl.style.display='block'; return; }
+    const {y,m,d} = resolved;
     const hasTime = selectedTimeIdx !== 'unknown';
     const hh = hasTime ? TIME_MID[selectedTimeIdx] : 12;
-    renderResult({ name, gender:selectedGender, y, m, d, hasTime, hh, mm:0 });
+
+    // 궁합 입력 여부 확인 (패널이 열려 있고, 필수값이 채워진 경우만 계산)
+    let partner = null;
+    const compatOpen = document.getElementById('compatPanel').classList.contains('open');
+    if(compatOpen){
+      const pDateFilled = partnerCalType==='solar'
+        ? !!document.getElementById('partnerDateInput').value
+        : true;
+      if(partnerGender && pDateFilled && partnerTimeIdx!==null){
+        const pResolved = resolveSolarDate(partnerCalType,'partnerDateInput','partnerLunarYear','partnerLunarMonth','partnerLunarDay','partnerLeapMonth', errEl, '상대방');
+        if(pResolved.error){ errEl.textContent=pResolved.error; errEl.style.display='block'; return; }
+        const pHasTime = partnerTimeIdx !== 'unknown';
+        const pHh = pHasTime ? TIME_MID[partnerTimeIdx] : 12;
+        partner = {
+          name: document.getElementById('partnerNameInput').value,
+          gender: partnerGender,
+          y: pResolved.y, m: pResolved.m, d: pResolved.d,
+          hasTime: pHasTime, hh: pHh, mm: 0
+        };
+      }
+    }
+
+    renderResult({ name, gender:selectedGender, y, m, d, hasTime, hh, mm:0, partner });
   });
 
   document.getElementById('restartBtn').addEventListener('click', ()=>{
@@ -1394,13 +1661,5 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 
 </script>
-<a class="kakao-float" href="https://open.kakao.com/o/sDvngCLi" target="_blank" rel="noopener noreferrer">
-  <span class="kakao-label">상담하기</span>
-  <span class="kakao-bubble">
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-      <path d="M32 10C17.6 10 6 19.2 6 30.6c0 7.3 4.8 13.7 12 17.4l-2.4 9c-.2.8.6 1.4 1.3 1L27 51.5c1.6.2 3.3.3 5 .3 14.4 0 26-9.2 26-20.6S46.4 10 32 10z" fill="#3C1E1E"/>
-    </svg>
-  </span>
-</a>
 </body>
 </html>
