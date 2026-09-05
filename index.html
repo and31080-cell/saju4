@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -597,6 +598,11 @@ footer.site-foot{
       <div class="acc-body"><div class="acc-body-inner" id="accLove"></div></div>
     </div>
 
+    <div class="acc" id="accDohwaWrap">
+      <div class="acc-head"><div class="htxt"><span class="ico"></span><h3>신살 · 나에게 있는 특별한 기운</h3></div><span class="chev"></span></div>
+      <div class="acc-body"><div class="acc-body-inner" id="accDohwa"></div></div>
+    </div>
+
     <div class="acc">
       <div class="acc-head"><div class="htxt"><span class="ico"></span><h3>건강 참고</h3></div><span class="chev"></span></div>
       <div class="acc-body"><div class="acc-body-inner" id="accHealth"></div></div>
@@ -929,14 +935,185 @@ const YEAR_FLOW = {
   '편인': '혼자만의 시간과 몰입이 필요해지는 해입니다. 연구, 자격증, 새로운 분야 탐색처럼 깊이 파고드는 일에 유리한 흐름이지만, 사람들과 거리를 두고 생각이 많아지며 다소 예민해질 수 있습니다. 의도적으로 사람을 만나는 시간을 마련해두는 것이 균형에 도움이 됩니다.'
 };
 
-// 마무리 한마디 + 키워드 — 격국 그룹 기준 5종
+// 마무리 한마디 + 키워드 — 격국(5) × 오행 최다(5) = 25종으로 확장
 const CLOSING = {
-  '비겁': { line: '경쟁 속에서도 결국 내 힘으로 길을 만드는 사주입니다.', keywords: ['독립', '추진력', '주체성', '실행력'] },
-  '식상': { line: '머릿속 생각을 세상 밖으로 꺼낼 때 진짜 힘이 발휘되는 사주입니다.', keywords: ['표현력', '창의성', '자유', '재능'] },
-  '재성': { line: '사람과 기회를 알아보는 감각이 결국 실속으로 이어지는 사주입니다.', keywords: ['수완', '인맥', '실속', '기회포착'] },
-  '관성': { line: '신뢰를 쌓아가는 만큼 자리가 단단해지는 사주입니다.', keywords: ['책임감', '신뢰', '안정', '성실'] },
-  '인성': { line: '배우고 채운 만큼 결국 나를 지탱하는 힘이 되는 사주입니다.', keywords: ['학습력', '통찰', '귀인운', '전문성'] }
+  '비겁': {
+    '목': { line: '거침없이 뻗어나가며 스스로 길을 개척하는 사주입니다.', keywords: ['독립', '추진력', '개척정신', '성장'] },
+    '화': { line: '타오르는 열정으로 경쟁 속에서도 자기 몫을 해내는 사주입니다.', keywords: ['열정', '독립', '승부욕', '추진력'] },
+    '토': { line: '신중하게 때를 보다가도 결국 자기 힘으로 밀어붙이는 사주입니다.', keywords: ['뚝심', '신중함', '독립', '인내'] },
+    '금': { line: '맺고 끊음이 분명한 태도로 홀로 우뚝 서는 사주입니다.', keywords: ['결단력', '독립', '원칙', '추진력'] },
+    '수': { line: '깊은 생각 끝에 결국 스스로 답을 찾아내는 사주입니다.', keywords: ['독립', '통찰력', '주체성', '전략'] }
+  },
+  '식상': {
+    '목': { line: '새로운 아이디어를 거침없이 세상에 펼쳐내는 사주입니다.', keywords: ['창의성', '표현력', '확장성', '자유'] },
+    '화': { line: '즉흥적인 매력과 끼로 사람들의 시선을 사로잡는 사주입니다.', keywords: ['끼', '표현력', '매력', '열정'] },
+    '토': { line: '느긋해 보여도 결국 자기만의 방식으로 표현해내는 사주입니다.', keywords: ['표현력', '여유', '창의성', '꾸준함'] },
+    '금': { line: '군더더기 없이 확실한 스타일로 재능을 드러내는 사주입니다.', keywords: ['재능', '표현력', '완성도', '개성'] },
+    '수': { line: '깊은 사유에서 길어 올린 통찰을 표현해내는 사주입니다.', keywords: ['통찰력', '표현력', '창의성', '사색'] }
+  },
+  '재성': {
+    '목': { line: '기회를 향해 망설임 없이 뻗어나가는 사주입니다.', keywords: ['수완', '추진력', '기회포착', '확장'] },
+    '화': { line: '사람을 끌어당기는 매력으로 기회를 만들어내는 사주입니다.', keywords: ['매력', '수완', '인맥', '열정'] },
+    '토': { line: '신중하게 저울질한 뒤 실속을 챙기는 사주입니다.', keywords: ['실속', '신중함', '수완', '안정'] },
+    '금': { line: '정확한 판단으로 기회를 놓치지 않는 사주입니다.', keywords: ['결단력', '수완', '실속', '원칙'] },
+    '수': { line: '깊이 있는 통찰로 사람과 기회를 알아보는 사주입니다.', keywords: ['통찰력', '수완', '인맥', '전략'] }
+  },
+  '관성': {
+    '목': { line: '책임감을 원동력 삼아 앞으로 나아가는 사주입니다.', keywords: ['책임감', '추진력', '신뢰', '성장'] },
+    '화': { line: '따뜻한 리더십으로 신뢰를 얻어내는 사주입니다.', keywords: ['리더십', '신뢰', '열정', '책임감'] },
+    '토': { line: '묵묵히 자리를 지키며 신뢰를 쌓아가는 사주입니다.', keywords: ['성실함', '신뢰', '안정', '인내'] },
+    '금': { line: '원칙을 지키는 태도로 확실하게 인정받는 사주입니다.', keywords: ['원칙', '신뢰', '책임감', '결단력'] },
+    '수': { line: '신중한 판단으로 오래가는 신뢰를 쌓는 사주입니다.', keywords: ['신중함', '신뢰', '통찰력', '안정'] }
+  },
+  '인성': {
+    '목': { line: '배운 것을 발판 삼아 계속 성장해가는 사주입니다.', keywords: ['성장', '학습력', '귀인운', '발전'] },
+    '화': { line: '따뜻한 마음으로 지식과 사람을 나누는 사주입니다.', keywords: ['통찰력', '귀인운', '따뜻함', '학습력'] },
+    '토': { line: '천천히, 그러나 단단하게 실력을 쌓아가는 사주입니다.', keywords: ['꾸준함', '학습력', '안정', '전문성'] },
+    '금': { line: '명확한 기준으로 전문성을 완성해가는 사주입니다.', keywords: ['전문성', '원칙', '학습력', '완성도'] },
+    '수': { line: '깊이 파고드는 탐구심으로 통찰을 얻는 사주입니다.', keywords: ['통찰력', '학습력', '사색', '전문성'] }
+  }
 };
+
+// ===================== 신살(神殺) 종합 판별 =====================
+function mod12(n){ return ((n%12)+12)%12; }
+
+// 삼합 그룹(생지 기준) — 12신살·년살(도화)·화개·역마·장성 등에 공용
+const SAMHAP_GROUP_OF_BRANCH = {2:'인오술',6:'인오술',10:'인오술', 5:'사유축',9:'사유축',1:'사유축', 8:'신자진',0:'신자진',4:'신자진', 11:'해묘미',3:'해묘미',7:'해묘미'};
+const SAMHAP_SAENGJI = { '인오술':2, '사유축':5, '신자진':8, '해묘미':11 };
+const SIBI_SINSAL_ORDER = ['겁살','재살','천살','지살','년살','월살','망신살','장성살','반안살','역마살','육해살','화개살'];
+function get12SinsalTargets(yearBranch){
+  const group = SAMHAP_GROUP_OF_BRANCH[yearBranch];
+  const g = SAMHAP_SAENGJI[group];
+  const map = {};
+  SIBI_SINSAL_ORDER.forEach((name,i)=>{ map[name] = mod12(g + i - 3); });
+  return map;
+}
+function findDohwa(saju){
+  const map = get12SinsalTargets(saju.year.branch);
+  const others = [saju.month.branch, saju.day.branch];
+  if (saju.hour) others.push(saju.hour.branch);
+  return others.includes(map['년살']);
+}
+
+// 천을귀인 — 일간 기준 지지 2개
+const CHEONEUL_TARGET = { 0:[1,7], 4:[1,7], 6:[1,7], 1:[0,8], 5:[0,8], 2:[11,9], 3:[11,9], 7:[6,2], 8:[5,3], 9:[5,3] };
+// 문창귀인 — 일간 기준 지지 1개
+const MUNCHANG_TARGET = { 0:5, 1:6, 2:8, 3:9, 4:8, 5:9, 6:11, 7:0, 8:2, 9:3 };
+// 금여록 — 일간 기준 지지 1개
+const GEUMYEO_TARGET = { 0:4, 1:5, 2:7, 3:8, 4:7, 5:8, 6:10, 7:11, 8:1, 9:2 };
+// 양인살 — 양간에만 존재
+const YANGIN_TARGET = { 0:3, 2:6, 4:6, 6:9, 8:0 };
+// 월덕귀인 — 월지 삼합 그룹 기준 천간
+const WOLDEOK_TARGET_BY_GROUP = { '인오술':2, '신자진':8, '해묘미':0, '사유축':6 };
+// 천덕귀인 — 월지 기준(간 또는 지 혼재)
+const CHEONDEOK_TARGET = {
+  2:{type:'stem', v:3}, 3:{type:'branch', v:8}, 4:{type:'stem', v:8}, 5:{type:'stem', v:7},
+  6:{type:'branch', v:11}, 7:{type:'stem', v:0}, 8:{type:'stem', v:9}, 9:{type:'branch', v:2},
+  10:{type:'stem', v:2}, 11:{type:'stem', v:1}, 0:{type:'branch', v:5}, 1:{type:'stem', v:6}
+};
+// 괴강살 / 백호살 — 특정 일주(간+지) 조합
+const GOEGANG_LIST = [[6,4],[6,10],[8,4],[8,10]];
+const BAEKHO_LIST = [[0,4],[1,7],[2,10],[3,1],[4,4],[8,10],[9,1]];
+// 귀문관살 — 지지 페어
+const GWIMUN_PAIRS = [[0,9],[1,6],[2,7],[3,8],[4,11],[5,10]];
+
+function allBranches(saju){ const arr=[saju.year.branch, saju.month.branch, saju.day.branch]; if(saju.hour) arr.push(saju.hour.branch); return arr; }
+function allStems(saju){ const arr=[saju.year.stem, saju.month.stem, saju.day.stem]; if(saju.hour) arr.push(saju.hour.stem); return arr; }
+function allPillars(saju){ const arr=[[saju.year.stem,saju.year.branch],[saju.month.stem,saju.month.branch],[saju.day.stem,saju.day.branch]]; if(saju.hour) arr.push([saju.hour.stem,saju.hour.branch]); return arr; }
+
+function findAllSinsal(saju){
+  const dayStemIdx = saju.day.stem;
+  const branches = allBranches(saju);
+  const stems = allStems(saju);
+  const pillars = allPillars(saju);
+  const others = [saju.month.branch, saju.day.branch]; if(saju.hour) others.push(saju.hour.branch);
+
+  const found = [];
+
+  // 12신살(도화 제외 — 도화는 별도 강조 카드로 표시)
+  const s12 = get12SinsalTargets(saju.year.branch);
+  SIBI_SINSAL_ORDER.forEach(name=>{
+    if(name==='년살') return; // 도화살로 별도 처리
+    if(others.includes(s12[name])) found.push(name);
+  });
+
+  // 천을귀인
+  const ceTarget = CHEONEUL_TARGET[dayStemIdx];
+  if(ceTarget && branches.some(b=>ceTarget.includes(b))) found.push('천을귀인');
+
+  // 문창귀인
+  if(branches.includes(MUNCHANG_TARGET[dayStemIdx])) found.push('문창귀인');
+
+  // 금여록
+  if(branches.includes(GEUMYEO_TARGET[dayStemIdx])) found.push('금여록');
+
+  // 양인살
+  if(YANGIN_TARGET.hasOwnProperty(dayStemIdx) && branches.includes(YANGIN_TARGET[dayStemIdx])) found.push('양인살');
+
+  // 월덕귀인 (월지 기준, 천간에서 확인)
+  const monthGroup = SAMHAP_GROUP_OF_BRANCH[saju.month.branch];
+  if(monthGroup && stems.includes(WOLDEOK_TARGET_BY_GROUP[monthGroup])) found.push('월덕귀인');
+
+  // 천덕귀인 (월지 기준, 간 또는 지)
+  const cd = CHEONDEOK_TARGET[saju.month.branch];
+  if(cd){
+    if(cd.type==='stem' && stems.includes(cd.v)) found.push('천덕귀인');
+    if(cd.type==='branch' && branches.includes(cd.v)) found.push('천덕귀인');
+  }
+
+  // 괴강살 / 백호살 (일주 등 특정 간지조합, 어느 기둥이든)
+  if(pillars.some(p=>GOEGANG_LIST.some(g=>g[0]===p[0]&&g[1]===p[1]))) found.push('괴강살');
+  if(pillars.some(p=>BAEKHO_LIST.some(b=>b[0]===p[0]&&b[1]===p[1]))) found.push('백호살');
+
+  // 귀문관살 (지지 페어 동시 존재)
+  if(GWIMUN_PAIRS.some(pair=>branches.includes(pair[0]) && branches.includes(pair[1]))) found.push('귀문관살');
+
+  // 현침살 (일간이 갑 또는 신)
+  if(dayStemIdx===0 || dayStemIdx===7) found.push('현침살');
+
+  // 공망 (일주 기준 순공)
+  const gapBranch = mod12(saju.day.branch - dayStemIdx);
+  const gong = [mod12(gapBranch+10), mod12(gapBranch+11)];
+  const gongOthers = [saju.year.branch, saju.month.branch]; if(saju.hour) gongOthers.push(saju.hour.branch);
+  if(gongOthers.some(b=>gong.includes(b))) found.push('공망');
+
+  return found;
+}
+
+const DOHWA_CONTENT = {
+  body: [
+    '사주 여덟 글자 안에 도화살(桃花殺)이 자리한 구조입니다. 예로부터 도화살은 사람을 끌어당기는 매력과 관련된 기운으로 여겨져 왔습니다. 특별히 애쓰지 않아도 자연스럽게 시선을 받거나 호감을 사는 편이고, 무대·화면·SNS처럼 사람들 앞에 서는 자리에서 유독 빛이 나는 경우가 많습니다.',
+    '다만 그만큼 주변에 관심과 인연이 자주 몰리는 구조라, 관계의 경계를 스스로 분명히 해두지 않으면 오해나 소모적인 관계로 이어지기 쉽습니다. 매력을 가꾸는 것만큼, 그 매력을 어디에 누구에게 쓸지 선택하는 안목을 함께 기르는 것이 이 기운을 온전히 내 것으로 만드는 방법입니다. (12신살 체계에서는 이 자리를 "년살"이라고도 부릅니다.)'
+  ],
+  traits: ['사람들 앞에서 자연스럽게 드러나는 매력', '첫인상이 좋고 호감을 사기 쉬움', '예술·미용·엔터테인먼트 분야와 잘 맞는 감각', '분위기를 이끄는 사교성']
+};
+
+// 도화살 외 신살/귀인 22종 — 짧은 풀이
+const SINSAL_DESC = {
+  '겁살': '외부에서 오는 갑작스러운 변화나 압박에 노출되기 쉬운 자리입니다. 예상 못한 지출이나 사고에 대비하는 습관이 도움이 됩니다.',
+  '재살': '경쟁이나 다툼, 예기치 못한 사건·사고에 휘말리기 쉬운 자리입니다. 중요한 계약이나 다툼의 소지가 있는 자리는 한 번 더 점검하는 것이 좋습니다.',
+  '천살': '하늘에서 오는 것처럼 갑작스럽고 뜻밖의 외부 환경 변화를 겪기 쉬운 자리입니다. 스스로 통제할 수 없는 상황에 유연하게 대처하는 힘이 필요합니다.',
+  '지살': '이동과 새로운 환경에 대한 적응력이 좋은 자리입니다. 낯선 곳에서도 비교적 빠르게 자리를 잡는 편입니다.',
+  '월살': '일이 더디게 풀리거나 계획이 자꾸 늦춰지는 정체의 기운이 있는 자리입니다. 조급해하기보다 때를 기다리는 여유가 필요합니다.',
+  '망신살': '생각지 못한 순간에 속마음이나 상황이 드러나기 쉬운 자리입니다. 그만큼 숨김없이 자신을 표현하는 솔직함으로 이어지기도 합니다.',
+  '장성살': '무리를 이끄는 리더십과 중심을 잡는 힘이 강한 자리입니다. 스스로 결정하고 책임지는 자리에서 능력이 빛납니다.',
+  '반안살': '그동안의 노력이 인정받아 자리를 잡아가는 안정과 명예의 기운입니다. 오른 자리에서 자만하지 않는 태도가 오래가는 비결입니다.',
+  '역마살': '이동, 여행, 변화와 인연이 깊은 자리입니다. 한곳에 오래 머무르기보다 움직이면서 기회를 만드는 편이 잘 맞습니다.',
+  '육해살': '인간관계에서 오해나 마찰이 생기기 쉬운 자리입니다. 가까운 사이일수록 감정을 쌓아두지 않고 풀어가는 습관이 도움이 됩니다.',
+  '화개살': '예술, 종교, 철학처럼 깊이 있는 내면의 세계와 인연이 깊은 자리입니다. 혼자만의 시간 속에서 오히려 재능이 빛을 발합니다.',
+  '백호살': '강렬하고 다듬어지지 않은 기운이 자리한 곳입니다. 의료·법조·기술처럼 결단력이 필요한 분야에서 강점으로 작용하는 경우가 많습니다.',
+  '괴강살': '강한 주관과 카리스마, 분명한 결단력을 지닌 자리입니다. 큰 그릇이 될 수 있는 힘이지만, 스스로를 조율하는 여유도 필요합니다.',
+  '양인살': '강한 추진력과 승부욕이 자리한 곳입니다. 경쟁 속에서 오히려 강해지는 편이지만, 극단으로 치닫지 않도록 다스리는 것이 중요합니다.',
+  '현침살': '예민하고 날카로운 감각이 발달한 자리입니다. 의료·기술·정교한 작업처럼 섬세함이 필요한 분야와 잘 맞습니다.',
+  '귀문관살': '예민한 직관과 독특한 사고방식을 지닌 자리입니다. 남들이 보지 못하는 것을 알아채는 감각이 있지만, 생각이 많아 스스로를 지치게 할 수 있습니다.',
+  '천을귀인': '위기의 순간마다 뜻밖의 도움을 받는 귀인운이 깃든 자리입니다. 명리학에서 가장 귀하게 여기는 길신 중 하나로 꼽습니다.',
+  '문창귀인': '학문과 글, 지적인 감각이 뛰어난 자리입니다. 공부나 자격, 문서와 관련된 일에서 두각을 나타내기 좋습니다.',
+  '천덕귀인': '위기의 순간 큰 화를 피해가는, 하늘이 덜어주는 보호의 기운이 깃든 자리입니다.',
+  '월덕귀인': '주변 사람과 환경이 조용히 나를 받쳐주는 든든한 덕의 기운이 깃든 자리입니다.',
+  '금여록': '배우자운과 생활의 안정이 깃든 자리입니다. 부드러운 인상과 함께 원만한 결혼운으로 이어지는 경우가 많습니다.',
+  '공망': '기대와 현실 사이에 묘한 간극을 느끼기 쉬운 자리입니다. 채워지지 않는 허전함이 있을 수 있지만, 그만큼 집착 없이 자유로운 시선을 갖게 되는 자리이기도 합니다.'
+};
+
 
 const YEAR_STEM_HANJA = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 const YEAR_BRANCH_HANJA = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
@@ -1097,8 +1274,28 @@ function renderResult(input){
   const presc = PRESCRIPTION[weak];
   document.getElementById('accPrescription').innerHTML = `<p>${weak}(${EL_HANJA[EL_KO.indexOf(weak)]}) 기운이 상대적으로 부족한 구조입니다. ${presc.color}을 가까이 하고, ${presc.direction} 방향과 관련된 공간을 챙겨보세요. ${presc.taste}과 ${presc.material}을 곁에 두는 것도 도움이 되며, ${presc.extra}도 함께 신경 쓰면 좋습니다.</p>`;
 
+  // 신살 종합 (도화살 강조 + 나머지 발견된 신살 목록)
+  const hasDohwa = findDohwa(saju);
+  const otherSinsal = findAllSinsal(saju);
+  let sinsalHtml = '';
+  if (hasDohwa) {
+    sinsalHtml += `<h4>도화살(桃花殺)</h4>`;
+    sinsalHtml += DOHWA_CONTENT.body.map(p=>`<p>${p}</p>`).join('');
+    sinsalHtml += `<ul>${DOHWA_CONTENT.traits.map(t=>`<li>${t}</li>`).join('')}</ul>`;
+  }
+  if (otherSinsal.length) {
+    if (hasDohwa) sinsalHtml += `<div class="acc-foot-note" style="margin:14px 0 4px;">그 밖에 사주에서 확인되는 기운입니다.</div>`;
+    sinsalHtml += `<ul class="sinsal-list">` + otherSinsal.map(name =>
+      `<li><b>${name}</b> — ${SINSAL_DESC[name]}</li>`
+    ).join('') + `</ul>`;
+  }
+  if (!hasDohwa && !otherSinsal.length) {
+    sinsalHtml = `<p>이번 사주 원국에서는 도드라지는 신살이 뚜렷하게 확인되지 않습니다. 신살이 없다고 해서 기운이 약한 것은 아니며, 오히려 오행과 격국의 균형이 안정적인 구조일 수 있습니다.</p>`;
+  }
+  document.getElementById('accDohwa').innerHTML = sinsalHtml;
+
   // 마무리
-  const closing = CLOSING[gk.group];
+  const closing = CLOSING[gk.group][strong];
   document.getElementById('closingBlock').innerHTML = `
     <div class="kt">${displayName}에게 전하는 한마디</div>
     <h3>${closing.line}</h3>
